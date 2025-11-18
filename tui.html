@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiệu Ứng Matrix Tình Yêu</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        #loveMatrix { 
+            display: block; 
+        }
+
+        /* ====================== TEXT TRUNG TÂM ====================== */
+        #overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-family: "Arial Black", sans-serif;
+            text-align: center;
+            font-weight: 900;
+            font-size: 8vw;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            text-shadow:
+                0 0 10px rgba(255,255,255,0.8),
+                0 0 20px rgba(255,255,255,0.6),
+                0 0 30px rgba(255,255,255,0.4),
+                0 0 40px #fff;
+        }
+
+        /* Sửa lại @media đúng chuẩn */
+        @media (min-width: 1200px) {
+            #overlay-text {
+                font-size: min(8vw, 100px);
+            }
+        }
+
+        /* ====================== TRÁI TIM CUỐI ====================== */
+        .final-heart {
+            color: #FF0000 !important;
+            font-size: 25vw !important;
+            text-shadow:
+                0 0 30px rgba(255,0,0,1),
+                0 0 60px rgba(255,50,50,0.8),
+                0 0 100px rgba(255,100,100,0.5) !important;
+        }
+
+        .final-heart.show-text {
+            animation: pulse-red-heart 1.5s infinite alternate !important;
+        }
+
+        @keyframes pulse-red-heart {
+            from { text-shadow: 0 0 30px #f00, 0 0 60px #f00; }
+            to { text-shadow: 0 0 15px #f00, 0 0 45px #f00; }
+        }
+
+        /* ====================== HIỆU ỨNG LẤP LÁNH ====================== */
+        @keyframes pulse-glitter {
+            from {
+                text-shadow:
+                    0 0 10px rgba(255,255,255,0.8),
+                    0 0 25px rgba(255,255,255,0.6),
+                    0 0 50px rgba(255,255,255,0.3);
+            }
+            to {
+                text-shadow:
+                    0 0 5px rgba(255,255,255,1),
+                    0 0 15px rgba(255,255,255,0.8),
+                    0 0 30px rgba(255,255,255,0.5);
+            }
+        }
+
+        .show-text {
+            opacity: 1 !important;
+            transform: translate(-50%, -50%) scale(1) !important;
+            animation: pulse-glitter 1.5s infinite alternate;
+        }
+
+        .hide-text {
+            opacity: 0 !important;
+            transform: translate(-50%, -50%) scale(1.5) !important;
+            animation: glitter-burst 0.5s forwards;
+        }
+
+        @keyframes glitter-burst {
+            0% { filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 30px #fff); }
+            100% { filter: drop-shadow(0 0 50px #fff) drop-shadow(0 0 100px #fff); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="loveMatrix"></canvas>
+    <div id="overlay-text"></div>
+
+    <script>
+        const canvas = document.getElementById("loveMatrix");
+        const ctx = canvas.getContext("2d");
+        const overlayText = document.getElementById("overlay-text");
+
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+
+        const characters = "L O V E Y O U I 0 1 2 3 4 5 6 7 8 9 $ % # @".split("");
+        const fontSize = 16;
+        const columns = Math.floor(w / fontSize);
+        const drops = Array(columns).fill(1);
+        const color = "#FF007F";
+
+        window.onresize = () => {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        };
+
+        function draw() {
+            ctx.fillStyle = "rgba(0,0,0,0.05)";
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.fillStyle = color;
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters[Math.floor(Math.random() * characters.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                ctx.fillText(text, x, y);
+
+                if (y > h && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+
+        /* ====================== CHUỖI TIN NHẮN ====================== */
+        const messages = [
+            { text: "3", duration: 1000 },
+            { text: "2", duration: 1000 },
+            { text: "1", duration: 1000 },
+            { text: "CHỒNG IU 19-11 VUI VẺ", duration: 2500 },
+            { text: "CHÚC ANH SỨC KHOẺ", duration: 2500 },
+            { text: "CHÚC ANH LUÔN THÀNH CÔNG", duration: 2500 },
+            { text: "LUÔN VỮNG VÀNG", duration: 2000 },
+            { text: "LUÔN YÊU EM", duration: 3000 },
+            { text: "MỪNG NGÀY QUỐC TẾ ĐÀN ÔNG 🥰", duration: 5000 },
+        ];
+
+        let messageIndex = 0;
+
+        function updateOverlayText() {
+            if (messageIndex < messages.length) {
+                const msg = messages[messageIndex];
+
+                if (overlayText.classList.contains("show-text")) {
+                    overlayText.classList.remove("show-text");
+                    overlayText.classList.add("hide-text");
+
+                    setTimeout(() => showNextMessage(msg), 500);
+                } else {
+                    showNextMessage(msg);
+                }
+
+            } else if (messageIndex === messages.length) {
+                overlayText.classList.remove("show-text");
+                overlayText.classList.add("hide-text");
+
+                setTimeout(() => {
+                    overlayText.innerHTML = "❤️";
+                    overlayText.classList.remove("hide-text");
+                    overlayText.classList.add("final-heart");
+                    overlayText.classList.add("show-text");
+                }, 500);
+
+                messageIndex++;
+            }
+        }
+
+        function showNextMessage(msg) {
+            overlayText.innerHTML = msg.text;
+            overlayText.classList.remove("hide-text");
+            overlayText.classList.remove("final-heart");
+            overlayText.classList.add("show-text");
+
+            setTimeout(() => {
+                messageIndex++;
+                updateOverlayText();
+            }, msg.duration);
+        }
+
+        function loop() {
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+        updateOverlayText();
+    </script>
+</body>
+</html>
